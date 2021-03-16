@@ -1,6 +1,4 @@
 ﻿FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
-RUN apt install git
-RUN git clone https://github.com/Tasktower/Tasktower.Webtools
 COPY . Tasktower.OcelotAPIGateway/Tasktower.OcelotAPIGateway
 WORKDIR  /Tasktower.OcelotAPIGateway/Tasktower.OcelotAPIGateway
 RUN dotnet restore "Tasktower.OcelotAPIGateway.csproj"
