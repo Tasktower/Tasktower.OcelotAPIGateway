@@ -1,5 +1,5 @@
 ﻿FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
-COPY . Tasktower.OcelotAPIGateway/Tasktower.OcelotGateway
+COPY . Tasktower.OcelotAPIGateway
 WORKDIR  /Tasktower.OcelotAPIGateway/Tasktower.OcelotGateway
 RUN dotnet restore "Tasktower.OcelotGateway.csproj"
 RUN dotnet publish "Tasktower.OcelotGateway.csproj" -c release -o /DockerOutput/Website --no-restore
