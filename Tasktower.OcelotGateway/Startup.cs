@@ -13,7 +13,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
-using Tasktower.OcelotAPIGateway.Middleware;
 
 namespace Tasktower.OcelotAPIGateway
 {
@@ -29,15 +28,6 @@ namespace Tasktower.OcelotAPIGateway
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddAuthentication(options => {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer("Bearer", o => {
-                o.Authority = Configuration["Auth:Authority"];
-                o.Audience = Configuration["Auth:Audience"];
-            });
-            services.AddAuthorization();
-
             services.AddOcelot(Configuration);
         }
 
@@ -52,11 +42,6 @@ namespace Tasktower.OcelotAPIGateway
             app.UseHttpsRedirection();
 
             app.UseRouting();
-
-            app.UseAuthentication();
-            app.UseAuthorization();
-
-            app.UseMiddleware<ClaimsToHeaderMiddleware>();
 
             app.UseEndpoints(endpoints =>
             {
