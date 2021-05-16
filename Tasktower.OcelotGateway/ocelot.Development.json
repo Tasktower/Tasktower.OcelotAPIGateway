@@ -21,7 +21,7 @@
           "Port": 8082
         }
       ],
-      "UpstreamPathTemplate": "/api/boardservice/{everything}",
+      "UpstreamPathTemplate": "/api/projectservice/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "PATCH", "DELETE" ]
     }
   ],

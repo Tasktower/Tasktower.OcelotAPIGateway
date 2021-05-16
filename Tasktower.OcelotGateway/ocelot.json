@@ -17,11 +17,11 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "tasktower-board-service",
+          "Host": "tasktower-project-service",
           "Port": 80
         }
       ],
-      "UpstreamPathTemplate": "/api/boardservice/{everything}",
+      "UpstreamPathTemplate": "/api/projectservice/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "PATCH", "DELETE" ]
     }
   ],

@@ -22,8 +22,8 @@ namespace Tasktower.OcelotAPIGateway
                 .ConfigureAppConfiguration(
                     (hbc, ic) => {
                         ic
-                        .AddJsonFile(Path.Combine("Configuration", $"ocelot.json"))
-                        .AddJsonFile(Path.Combine("Configuration", $"ocelot.{hbc.HostingEnvironment.EnvironmentName}.json"), true);
+                        .AddJsonFile("ocelot.json")
+                        .AddJsonFile("ocelot.{hbc.HostingEnvironment.EnvironmentName}.json", true);
                     })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
