@@ -14,22 +14,22 @@ namespace Tasktower.OcelotGateway.Configuration.StartupExtensions
     {
         public static void ConfigureCookies(this IServiceCollection services, IConfiguration configuration)
         {
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                options.MinimumSameSitePolicy = SameSiteMode.Unspecified;
-                options.OnAppendCookie = cookieContext => CheckSameSite(cookieContext.CookieOptions);
-                options.OnDeleteCookie = cookieContext => CheckSameSite(cookieContext.CookieOptions);
-            });
+            // services.Configure<CookiePolicyOptions>(options =>
+            // {
+            //     options.MinimumSameSitePolicy = SameSiteMode.Unspecified;
+            //     options.OnAppendCookie = cookieContext => CheckSameSite(cookieContext.CookieOptions);
+            //     options.OnDeleteCookie = cookieContext => CheckSameSite(cookieContext.CookieOptions);
+            // });
 
         }
         
-        private static void CheckSameSite(CookieOptions options)
-        {
-            if (options.SameSite == SameSiteMode.None && options.Secure == false)
-            {
-                options.SameSite = SameSiteMode.Unspecified;
-            }
-        }
+        // private static void CheckSameSite(CookieOptions options)
+        // {
+        //     if (options.SameSite == SameSiteMode.None && options.Secure == false)
+        //     {
+        //         options.SameSite = SameSiteMode.Unspecified;
+        //     }
+        // }
 
         public static void ConfigureOpenId(this IServiceCollection services, IConfiguration configuration)
         {
