@@ -10,7 +10,7 @@ using Tasktower.OcelotGateway.Security;
 namespace Tasktower.OcelotGateway.Controllers
 {
     [ApiController]
-    [Route("auth")]
+    [Route("auth-client")]
     public class AuthController : ControllerBase
     {
         [HttpGet("login")]

@@ -14,11 +14,11 @@ namespace Tasktower.OcelotGateway.Configuration.StartupExtensions
         public static void ConfigureCookies(this IServiceCollection services, IConfiguration configuration)
         {
             // Cookie configuration for HTTP to support cookies with SameSite=None
-            services.AddCookiePolicy(o =>
-            {
-                o.MinimumSameSitePolicy =SameSiteMode.Lax;
-                o.Secure = CookieSecurePolicy.SameAsRequest;
-            });
+            // services.AddCookiePolicy(o =>
+            // {
+            //     o.MinimumSameSitePolicy =SameSiteMode.Lax;
+            //     o.Secure = CookieSecurePolicy.SameAsRequest;
+            // });
 
         }
 
@@ -50,7 +50,7 @@ namespace Tasktower.OcelotGateway.Configuration.StartupExtensions
 
                     // Set the callback path, so Auth0 will call back to http://localhost:<insert port>/
                     // Also ensure that you have added the URL as an Allowed Callback URL in your Auth0 dashboard
-                    options.CallbackPath =  "/callback";
+                    options.CallbackPath =  "/";
 
                     // Configure the Claims Issuer to be Auth0
                     options.ClaimsIssuer = "Auth0";
