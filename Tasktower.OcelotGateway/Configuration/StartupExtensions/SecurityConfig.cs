@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,13 +14,21 @@ namespace Tasktower.OcelotGateway.Configuration.StartupExtensions
     {
         public static void ConfigureCookies(this IServiceCollection services, IConfiguration configuration)
         {
-            // Cookie configuration for HTTP to support cookies with SameSite=None
-            // services.AddCookiePolicy(o =>
-            // {
-            //     o.MinimumSameSitePolicy =SameSiteMode.Lax;
-            //     o.Secure = CookieSecurePolicy.SameAsRequest;
-            // });
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                options.MinimumSameSitePolicy = SameSiteMode.Unspecified;
+                options.OnAppendCookie = cookieContext => CheckSameSite(cookieContext.CookieOptions);
+                options.OnDeleteCookie = cookieContext => CheckSameSite(cookieContext.CookieOptions);
+            });
 
+        }
+        
+        private static void CheckSameSite(CookieOptions options)
+        {
+            if (options.SameSite == SameSiteMode.None && options.Secure == false)
+            {
+                options.SameSite = SameSiteMode.Unspecified;
+            }
         }
 
         public static void ConfigureOpenId(this IServiceCollection services, IConfiguration configuration)
@@ -41,6 +50,7 @@ namespace Tasktower.OcelotGateway.Configuration.StartupExtensions
 
                     // Set response type to code
                     options.ResponseType = OpenIdConnectResponseType.Code;
+                    // options.ResponseMode = OpenIdConnectResponseMode.Query;
 
                     // Configure the scope
                     options.Scope.Clear();
@@ -50,7 +60,7 @@ namespace Tasktower.OcelotGateway.Configuration.StartupExtensions
 
                     // Set the callback path, so Auth0 will call back to http://localhost:<insert port>/
                     // Also ensure that you have added the URL as an Allowed Callback URL in your Auth0 dashboard
-                    options.CallbackPath =  "/";
+                    options.CallbackPath = new PathString("/callback");
 
                     // Configure the Claims Issuer to be Auth0
                     options.ClaimsIssuer = "Auth0";

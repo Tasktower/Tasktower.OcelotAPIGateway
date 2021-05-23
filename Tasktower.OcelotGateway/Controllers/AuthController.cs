@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Tasktower.OcelotGateway.Dtos;
 using Tasktower.OcelotGateway.Security;
@@ -19,6 +20,7 @@ namespace Tasktower.OcelotGateway.Controllers
             await HttpContext.ChallengeAsync("Auth0", new AuthenticationProperties() { RedirectUri = returnUrl });
         }
         
+        [Authorize]
         [HttpGet("logout")]
         public async Task Logout([FromQuery]string returnUrl)
         {

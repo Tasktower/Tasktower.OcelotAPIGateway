@@ -26,7 +26,7 @@ namespace Tasktower.OcelotGateway.Security.Middlewares
             if (context.User.Identity != null && context.User.Identity.IsAuthenticated)
             {
                 var accessToken = await context.GetTokenAsync("access_token");
-                context.Request.Headers["Authorization"] = accessToken ?? "";
+                context.Request.Headers["Authorization"] = $"Bearer {accessToken ?? ""}";
             }
             await _next(context);
         }
