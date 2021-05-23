@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,22 +15,22 @@ namespace Tasktower.OcelotGateway.Configuration.StartupExtensions
     {
         public static void ConfigureCookies(this IServiceCollection services, IConfiguration configuration)
         {
-            // services.Configure<CookiePolicyOptions>(options =>
-            // {
-            //     options.MinimumSameSitePolicy = SameSiteMode.Unspecified;
-            //     options.OnAppendCookie = cookieContext => CheckSameSite(cookieContext.CookieOptions);
-            //     options.OnDeleteCookie = cookieContext => CheckSameSite(cookieContext.CookieOptions);
-            // });
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                options.MinimumSameSitePolicy = SameSiteMode.Lax;
+                options.OnAppendCookie = cookieContext => CheckSameSite(cookieContext.CookieOptions);
+                options.OnDeleteCookie = cookieContext => CheckSameSite(cookieContext.CookieOptions);
+            });
 
         }
         
-        // private static void CheckSameSite(CookieOptions options)
-        // {
-        //     if (options.SameSite == SameSiteMode.None && options.Secure == false)
-        //     {
-        //         options.SameSite = SameSiteMode.Unspecified;
-        //     }
-        // }
+        private static void CheckSameSite(CookieOptions options)
+        {
+            if (options.SameSite == SameSiteMode.None && options.Secure == false)
+            {
+                options.SameSite = SameSiteMode.Lax;
+            }
+        }
 
         public static void ConfigureOpenId(this IServiceCollection services, IConfiguration configuration)
         {
