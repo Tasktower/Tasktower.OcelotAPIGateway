@@ -23,7 +23,7 @@ namespace Tasktower.OcelotAPIGateway
                     (hbc, ic) => {
                         ic
                         .AddJsonFile("ocelot.json")
-                        .AddJsonFile("ocelot.{hbc.HostingEnvironment.EnvironmentName}.json", true);
+                        .AddJsonFile($"ocelot.{hbc.HostingEnvironment.EnvironmentName}.json", true);
                     })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
