@@ -16,7 +16,7 @@ using Ocelot.Middleware;
 using Tasktower.OcelotGateway.Configuration.StartupExtensions;
 using Tasktower.OcelotGateway.Security.Middlewares;
 
-namespace Tasktower.OcelotAPIGateway
+namespace Tasktower.OcelotGateway
 {
     public class Startup
     {

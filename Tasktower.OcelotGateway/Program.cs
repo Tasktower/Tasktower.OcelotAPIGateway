@@ -8,7 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Tasktower.OcelotAPIGateway
+namespace Tasktower.OcelotGateway
 {
     public class Program
     {
