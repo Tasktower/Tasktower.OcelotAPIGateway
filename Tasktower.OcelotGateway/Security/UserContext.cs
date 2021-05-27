@@ -25,7 +25,6 @@ namespace Tasktower.OcelotGateway.Security
 
         public string Name => _user?.Identity?.Name ?? "ANONYMOUS";
 
-        public ICollection<string> Roles => _user?.FindAll(ClaimTypes.Role)
-            .Select(r => r.Value).ToHashSet();
+        public ICollection<string> Roles => _user?.FindAll("permissions").Select(r => r.Value).ToHashSet();
     }
 }
