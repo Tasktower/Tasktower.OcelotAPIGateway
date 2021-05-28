@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.CookiePolicy;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +13,33 @@ namespace Tasktower.OcelotGateway.Configuration.StartupExtensions
 {
     public static class SecurityConfig
     {
+        
+        public const string XsrfTokenHeaderName = "XSRF-REQUEST-TOKEN";
+        public const string XsrfCookieName = "X-XSRF-TOKEN";
+        
+        public static void ConfigureAntiForgery(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddAntiforgery(options =>
+            {
+                options.HeaderName = XsrfTokenHeaderName;
+            });
+        }
+        
+        public static void UseCorsConfig(this IApplicationBuilder app, IConfiguration configuration)
+        {
+            if (configuration.GetValue("Cors:Enable", false))
+            {
+                app.UseCors();
+            }
+        }
+        public static void ConfigureCors(this IServiceCollection services, IConfiguration configuration)
+        {
+            if (configuration.GetValue("Cors:Enable", false))
+            {
+                services.AddCors();
+            }
+        }
+
         public static void ConfigureCookies(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<CookiePolicyOptions>(options =>
@@ -24,7 +51,7 @@ namespace Tasktower.OcelotGateway.Configuration.StartupExtensions
 
         }
         
-        private static void CheckSameSite(CookieOptions options)
+        public static void CheckSameSite(CookieOptions options)
         {
             if (options.SameSite == SameSiteMode.None && options.Secure == false)
             {
@@ -32,7 +59,7 @@ namespace Tasktower.OcelotGateway.Configuration.StartupExtensions
             }
         }
 
-        public static void ConfigureOpenId(this IServiceCollection services, IConfiguration configuration)
+        public static void ConfigureAuth(this IServiceCollection services, IConfiguration configuration)
         {
             // Add authentication services
             services.AddAuthentication(options => {

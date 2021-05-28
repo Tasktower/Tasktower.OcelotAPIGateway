@@ -30,8 +30,10 @@ namespace Tasktower.OcelotGateway
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.ConfigureCors(Configuration);
             services.ConfigureCookies(Configuration);
-            services.ConfigureOpenId(Configuration);
+            services.ConfigureAuth(Configuration);
+            services.ConfigureAntiForgery(Configuration);
             services.AddOcelot(Configuration);
         }
 
@@ -46,10 +48,13 @@ namespace Tasktower.OcelotGateway
             app.UseHttpsRedirection();
 
             app.UseRouting();
+            
+            app.UseCorsConfig(Configuration);
 
             app.UseAuthentication();
             app.UseAuthorization();
 
+            app.UseMiddleware<CsrfMiddleware>();
             app.UseMiddleware<AccessTokenGetMiddleware>();
 
             app.UseEndpoints(endpoints =>

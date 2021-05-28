@@ -11,7 +11,7 @@ using Tasktower.OcelotGateway.Security;
 namespace Tasktower.OcelotGateway.Controllers
 {
     [ApiController]
-    [Route("auth-client")]
+    [Route("client/auth")]
     public class AuthController : ControllerBase
     {
         [HttpGet("login")]
@@ -33,32 +33,7 @@ namespace Tasktower.OcelotGateway.Controllers
             });
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         }
-        
-        [HttpGet("tokens")]
-        public async Task<TokensDto> GetTokens()
-        {
-            if (User.Identity != null && User.Identity.IsAuthenticated)
-            {
-                string accessToken = await HttpContext.GetTokenAsync("access_token");
-    
-                // if you need to check the Access Token expiration time, use this value
-                // provided on the authorization response and stored.
-                // do not attempt to inspect/decode the access token
-                DateTime accessTokenExpiresAt = DateTime.Parse(
-                    await HttpContext.GetTokenAsync("expires_at") ?? string.Empty, 
-                    CultureInfo.InvariantCulture,
-                    DateTimeStyles.RoundtripKind);
-        
-                string idToken = await HttpContext.GetTokenAsync("id_token");
 
-                // Now you can use them. For more info on when and how to use the
-                // Access Token and ID Token, see https://auth0.com/docs/tokens
-                return new TokensDto(){IdToken = idToken, AccessToken = accessToken, 
-                    AccessTokenExpirationDate = accessTokenExpiresAt};
-            }
-            return new TokensDto{};
-        }
-        
         [HttpGet("user")]
         public UserContext GetUser()
         {
