@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
@@ -6,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
+using StackExchange.Redis;
 using Tasktower.OcelotGateway.Configuration.StartupExtensions;
 using Tasktower.OcelotGateway.Security.Middlewares;
 
@@ -26,7 +28,7 @@ namespace Tasktower.OcelotGateway
             services.ConfigureCors(Configuration);
             services.ConfigureCookies(Configuration);
             services.ConfigureWebAppAuth(Configuration);
-            services.ConfigureAntiForgery(Configuration);
+            // services.ConfigureAntiForgery(Configuration);
             services.AddOcelot(Configuration);
             services.Configure<ForwardedHeadersOptions>(options =>
             {
@@ -53,7 +55,7 @@ namespace Tasktower.OcelotGateway
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseMiddleware<CsrfMiddleware>();
+            // app.UseMiddleware<CsrfMiddleware>();
             app.UseMiddleware<AccessTokenGetMiddleware>();
 
             app.UseEndpoints(endpoints =>

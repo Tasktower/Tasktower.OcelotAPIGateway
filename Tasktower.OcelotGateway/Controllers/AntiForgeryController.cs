@@ -8,13 +8,7 @@ namespace Tasktower.OcelotGateway.Controllers
     [Route("client/anti-forgery")]
     public class AntiForgeryController : ControllerBase
     {
-        private readonly IAntiforgery _antiForgery;
-        
-        public AntiForgeryController(IAntiforgery antiForgery)
-        {
-            _antiForgery = antiForgery;
-        }
-        
+
         [IgnoreAntiforgeryToken]
         public IActionResult Get()
         {

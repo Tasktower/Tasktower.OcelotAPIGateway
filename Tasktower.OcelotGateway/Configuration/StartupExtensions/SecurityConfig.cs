@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +12,8 @@ namespace Tasktower.OcelotGateway.Configuration.StartupExtensions
 {
     public static class SecurityConfig
     {
-        
+
+        public const string XsrfTokenFormName = "xsrfToken";
         public const string XsrfTokenHeaderName = "X-XSRF-TOKEN";
         public const string XsrfCookieName = "XSRF-TOKEN";
         
@@ -21,7 +21,10 @@ namespace Tasktower.OcelotGateway.Configuration.StartupExtensions
         {
             services.AddAntiforgery(options =>
             {
+                options.FormFieldName = XsrfTokenFormName;
                 options.HeaderName = XsrfTokenHeaderName;
+                options.Cookie.SameSite = SameSiteMode.Lax;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             });
         }
         
@@ -29,7 +32,11 @@ namespace Tasktower.OcelotGateway.Configuration.StartupExtensions
         {
             if (configuration.GetValue("Cors:Enable", false))
             {
-                app.UseCors();
+                app.UseCors(builder => builder
+                    .WithOrigins("https://localhost:5001")
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials());
             }
         }
         public static void ConfigureCors(this IServiceCollection services, IConfiguration configuration)
