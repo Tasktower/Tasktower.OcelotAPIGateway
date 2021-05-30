@@ -23,6 +23,10 @@ namespace Tasktower.OcelotGateway.Security.Middlewares
 
         public async Task Invoke(HttpContext context)
         {
+            //If a user is authenticated, it means their cookies are correct so a bearer token is set for them.
+            //In other cases, if you are just using a bearer token, it will just be passed down the pipeline.
+            //Your bearer token will be overwritten however if you are using browser cookies and they are valid.
+            //So bearer authentication is to be used if and only if you are not using a web app (i.e. desktop or mobile)
             if (context.User.Identity != null && context.User.Identity.IsAuthenticated)
             {
                 var accessToken = await context.GetTokenAsync("access_token");

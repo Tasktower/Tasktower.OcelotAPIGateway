@@ -1,16 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 using Tasktower.OcelotGateway.Configuration.StartupExtensions;
@@ -32,9 +25,14 @@ namespace Tasktower.OcelotGateway
         {
             services.ConfigureCors(Configuration);
             services.ConfigureCookies(Configuration);
-            services.ConfigureAuth(Configuration);
+            services.ConfigureWebAppAuth(Configuration);
             services.ConfigureAntiForgery(Configuration);
             services.AddOcelot(Configuration);
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders =
+                    ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -44,6 +42,7 @@ namespace Tasktower.OcelotGateway
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.UseForwardedHeaders();
 
             app.UseHttpsRedirection();
 

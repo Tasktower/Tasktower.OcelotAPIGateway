@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Tasktower.OcelotGateway.Dtos;
 using Tasktower.OcelotGateway.Security;
 
 namespace Tasktower.OcelotGateway.Controllers
@@ -14,14 +13,14 @@ namespace Tasktower.OcelotGateway.Controllers
     [Route("client/auth")]
     public class AuthController : ControllerBase
     {
-        [HttpGet("login")]
+        [HttpPost("login")]
         public async Task Login([FromQuery]string returnUrl)
         {
             await HttpContext.ChallengeAsync("Auth0", new AuthenticationProperties() { RedirectUri = returnUrl });
         }
         
         [Authorize]
-        [HttpGet("logout")]
+        [HttpPost("logout")]
         public async Task Logout([FromQuery]string returnUrl)
         {
             await HttpContext.SignOutAsync("Auth0", new AuthenticationProperties
@@ -34,6 +33,7 @@ namespace Tasktower.OcelotGateway.Controllers
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         }
 
+        [IgnoreAntiforgeryToken]
         [HttpGet("user")]
         public UserContext GetUser()
         {
