@@ -26,17 +26,12 @@ namespace Tasktower.OcelotGateway.Security.Middlewares
 
         public async Task Invoke(HttpContext context)
         {
-            var tokens = _antiForgery.GetAndStoreTokens(context);
-            context.Response.Cookies.Append(SecurityConfig.XsrfCookieName, tokens.RequestToken ?? string.Empty, 
-                new CookieOptions
-                {
-                    HttpOnly = false
-                });   
-            
+
             if (!SafeHttpMethods.Contains(context.Request.Method))
             {
                 await _antiForgery.ValidateRequestAsync(context);
             }
+
             await _next.Invoke(context);
         }
     }

@@ -14,14 +14,12 @@ namespace Tasktower.OcelotGateway.Controllers
     {
 
         // Token is ignored at the header
-        [IgnoreAntiforgeryToken]
         [HttpGet("login")]
         public async Task Login([FromQuery]string returnUrl)
         {
             await HttpContext.ChallengeAsync("Auth0", new AuthenticationProperties() { RedirectUri = returnUrl });
         }
         
-        [IgnoreAntiforgeryToken]
         [Authorize]
         [HttpGet("logout")]
         public async Task Logout([FromQuery]string returnUrl)
@@ -36,7 +34,6 @@ namespace Tasktower.OcelotGateway.Controllers
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         }
 
-        [IgnoreAntiforgeryToken]
         [HttpGet("user")]
         public UserContext GetUser()
         {

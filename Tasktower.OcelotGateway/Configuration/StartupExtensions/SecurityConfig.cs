@@ -13,9 +13,10 @@ namespace Tasktower.OcelotGateway.Configuration.StartupExtensions
     public static class SecurityConfig
     {
 
-        public const string XsrfTokenFormName = "xsrfToken";
+        public const string XsrfTokenFormName = "csrf-token";
         public const string XsrfTokenHeaderName = "X-XSRF-TOKEN";
-        public const string XsrfCookieName = "XSRF-TOKEN";
+        public const string XCsrfCookieName = "X-CSRF-TOKEN";
+        public const string XsrfRequestTokenCookieName = "XSRF-TOKEN";
         
         public static void ConfigureAntiForgery(this IServiceCollection services, IConfiguration configuration)
         {
