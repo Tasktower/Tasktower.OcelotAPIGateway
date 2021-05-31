@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
@@ -7,9 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
-using StackExchange.Redis;
 using Tasktower.OcelotGateway.Configuration.StartupExtensions;
-using Tasktower.OcelotGateway.Security.Middlewares;
 
 namespace Tasktower.OcelotGateway
 {
@@ -28,13 +25,16 @@ namespace Tasktower.OcelotGateway
             services.ConfigureCors(Configuration);
             services.ConfigureCookies(Configuration);
             services.ConfigureWebAppAuth(Configuration);
-            services.ConfigureAntiForgery(Configuration);
             services.AddOcelot(Configuration);
             services.Configure<ForwardedHeadersOptions>(options =>
             {
                 options.ForwardedHeaders =
                     ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
             });
+            // services.AddMvc(options =>
+            // {
+            //     options.Filters.Add(new ValidateAntiForgeryTokenAttribute());
+            // }); 
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -54,10 +54,7 @@ namespace Tasktower.OcelotGateway
 
             app.UseAuthentication();
             app.UseAuthorization();
-
-            app.UseMiddleware<CsrfMiddleware>();
-            app.UseMiddleware<AccessTokenGetMiddleware>();
-
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

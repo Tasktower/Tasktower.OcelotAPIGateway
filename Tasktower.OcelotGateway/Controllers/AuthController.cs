@@ -1,9 +1,13 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Globalization;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Tasktower.OcelotGateway.Configuration.StartupExtensions;
+using Tasktower.OcelotGateway.Dtos;
 using Tasktower.OcelotGateway.Security;
 
 namespace Tasktower.OcelotGateway.Controllers
@@ -13,7 +17,6 @@ namespace Tasktower.OcelotGateway.Controllers
     public class AuthController : ControllerBase
     {
 
-        // Token is ignored at the header
         [HttpGet("login")]
         public async Task Login([FromQuery]string returnUrl)
         {
@@ -32,6 +35,28 @@ namespace Tasktower.OcelotGateway.Controllers
                 RedirectUri = returnUrl
             });
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        }
+
+        [HttpGet("tokens")]
+        public async ValueTask<TokensDto> Tokens()
+        {
+            if (HttpContext.User.Identity != null && HttpContext.User.Identity.IsAuthenticated)
+            {
+                var accessTokenTask = HttpContext.GetTokenAsync("access_token");
+                var accessTokenExpiresAtTask = HttpContext.GetTokenAsync("expires_at");
+                var idTokenTask = HttpContext.GetTokenAsync("id_token");
+                return new TokensDto
+                {
+                    AccessToken = await accessTokenTask,
+                    AccessTokenExpiration = DateTime.Parse(
+                        await accessTokenExpiresAtTask ?? string.Empty, 
+                        CultureInfo.InvariantCulture,
+                        DateTimeStyles.RoundtripKind),
+                    IdToken = await idTokenTask
+                };
+            }
+
+            return new TokensDto();
         }
 
         [HttpGet("user")]
