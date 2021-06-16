@@ -12,6 +12,22 @@ namespace Tasktower.OcelotGateway.Configuration.StartupExtensions
 {
     public static class SecurityConfig
     {
+        
+        public const string XsrfTokenFormName = "XSRF-TOKEN";
+        public const string XsrfTokenHeaderName = "X-XSRF-TOKEN";
+        public const string XsrfRequestTokenCookieName = "XSRF-TOKEN";
+
+        public static void ConfigureAntiForgery(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddAntiforgery(options =>
+            {
+                options.FormFieldName = XsrfTokenFormName;
+                options.HeaderName = XsrfTokenHeaderName;
+                options.Cookie.SameSite = SameSiteMode.Strict;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            });
+        }
+        
         public static void UseCorsConfig(this IApplicationBuilder app, IConfiguration configuration)
         {
             if (configuration.GetValue("Cors:Enable", false))
