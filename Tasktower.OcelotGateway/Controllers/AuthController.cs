@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Globalization;
+using System.IdentityModel.Tokens.Jwt;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Tasktower.OcelotGateway.Configuration.StartupExtensions;
 using Tasktower.OcelotGateway.Dtos;
 using Tasktower.OcelotGateway.Security;
@@ -16,58 +18,48 @@ namespace Tasktower.OcelotGateway.Controllers
     [Route("client/auth")]
     public class AuthController : ControllerBase
     {
+        private readonly IConfiguration _configuration;
+        
+        public AuthController(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
 
-        // [ValidateAntiForgeryToken]
         [HttpPost("login")]
         public async Task Login([FromQuery]string returnUrl)
         {
-            await HttpContext.ChallengeAsync("Auth0", new AuthenticationProperties() { RedirectUri = returnUrl });
+            if (IsWebApp)
+            {
+                await HttpContext.ChallengeAsync("Auth0", new AuthenticationProperties()
+                {
+                    RedirectUri = returnUrl
+                });
+            }
         }
         
-        // [ValidateAntiForgeryToken]
-        [Authorize]
         [HttpPost("logout")]
         public async Task Logout([FromQuery]string returnUrl)
         {
-            await HttpContext.SignOutAsync("Auth0", new AuthenticationProperties
+            if (HttpContext.User.Identity != null && IsWebApp && HttpContext.User.Identity.IsAuthenticated)
             {
-                // Indicate here where Auth0 should redirect the user after a logout.
-                // Note that the resulting absolute Uri must be added to the
-                // **Allowed Logout URLs** settings for the app.
-                RedirectUri = returnUrl
-            });
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                await HttpContext.SignOutAsync("Auth0", new AuthenticationProperties
+                {
+                    // Indicate here where Auth0 should redirect the user after a logout.
+                    // Note that the resulting absolute Uri must be added to the
+                    // **Allowed Logout URLs** settings for the app.
+                    RedirectUri = returnUrl
+                });
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            }
+        }
+        
+        [HttpGet("user")]
+        public async Task<UserInfo> GetUser()
+        {
+            return await UserInfo.FromHttpContext(HttpContext, IsWebApp);
         }
 
-        // [IgnoreAntiforgeryToken]
-        // [HttpGet("tokens")]
-        // public async ValueTask<TokensDto> Tokens()
-        // {
-        //     if (HttpContext.User.Identity != null && HttpContext.User.Identity.IsAuthenticated)
-        //     {
-        //         var accessTokenTask = HttpContext.GetTokenAsync("access_token");
-        //         var accessTokenExpiresAtTask = HttpContext.GetTokenAsync("expires_at");
-        //         var idTokenTask = HttpContext.GetTokenAsync("id_token");
-        //         return new TokensDto
-        //         {
-        //             AccessToken = await accessTokenTask,
-        //             AccessTokenExpiration = DateTime.Parse(
-        //                 await accessTokenExpiresAtTask ?? string.Empty, 
-        //                 CultureInfo.InvariantCulture,
-        //                 DateTimeStyles.RoundtripKind),
-        //             IdToken = await idTokenTask
-        //         };
-        //     }
-        //
-        //     return new TokensDto();
-        // }
-        
-        // [IgnoreAntiforgeryToken]
-        [HttpGet("user")]
-        public UserContext GetUser()
-        {
-            return UserContext.FromHttpContext(HttpContext);
-        }
+        private bool IsWebApp => _configuration.GetValue("GatewayInfo:WebApp", true);
     }
     
     

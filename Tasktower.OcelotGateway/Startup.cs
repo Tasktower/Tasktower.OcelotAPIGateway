@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -26,18 +27,19 @@ namespace Tasktower.OcelotGateway
         {
             services.ConfigureCors(Configuration);
             services.ConfigureCookies(Configuration);
-            services.ConfigureWebAppAuth(Configuration);
             services.ConfigureAntiForgery(Configuration);
-            services.AddOcelot(Configuration);
+
+            if (IsWebApp)
+            {
+                services.ConfigureWebAppAuth(Configuration);
+            }
+
             services.Configure<ForwardedHeadersOptions>(options =>
             {
                 options.ForwardedHeaders =
                     ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
             });
-            // services.AddMvc(options =>
-            // {
-            //     options.Filters.Add(new ValidateAntiForgeryTokenAttribute());
-            // }); 
+            services.AddOcelot(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -57,9 +59,12 @@ namespace Tasktower.OcelotGateway
 
             app.UseAuthentication();
             app.UseAuthorization();
-            
-            app.UseMiddleware<CsrfMiddleware>();
-            app.UseMiddleware<AccessTokenGetMiddleware>();
+
+            if (IsWebApp)
+            {
+                app.UseMiddleware<CsrfMiddleware>();
+                app.UseMiddleware<WebAppCookieToOpenIdTokenMiddleware>();
+            }
 
             app.UseEndpoints(endpoints =>
             {
@@ -68,5 +73,7 @@ namespace Tasktower.OcelotGateway
 
             await app.UseOcelot();
         }
+
+        private bool IsWebApp => Configuration.GetValue("GatewayInfo:WebApp", true);
     }
 }

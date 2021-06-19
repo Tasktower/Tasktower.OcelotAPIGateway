@@ -24,12 +24,13 @@ namespace Tasktower.OcelotGateway.Controllers
                 tokens.RequestToken ?? string.Empty, 
                 new CookieOptions
                 {
-                    HttpOnly = false
+                    HttpOnly = false,
+                    SameSite = SameSiteMode.Strict
                 });
             return NoContent();
         }
         
-        // for testing antiforgery only
+        // for testing anti-forgery only
         [HttpPost("test")]
         public object PostTest()
         {

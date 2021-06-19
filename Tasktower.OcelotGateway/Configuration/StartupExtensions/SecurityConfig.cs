@@ -100,6 +100,7 @@ namespace Tasktower.OcelotGateway.Configuration.StartupExtensions
                     // Configure the Claims Issuer to be Auth0
                     options.ClaimsIssuer = "Auth0";
                     options.SaveTokens = true;
+                    options.GetClaimsFromUserInfoEndpoint = true;
 
                     options.Events = new OpenIdConnectEvents
                     {
