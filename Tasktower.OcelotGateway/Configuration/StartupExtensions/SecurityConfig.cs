@@ -30,14 +30,19 @@ namespace Tasktower.OcelotGateway.Configuration.StartupExtensions
         
         public static void UseCorsConfig(this IApplicationBuilder app, IConfiguration configuration)
         {
-            if (configuration.GetValue("Cors:Enable", false))
+            if (!configuration.GetValue("Cors:Enable", false))
             {
-                app.UseCors(builder => builder
-                    .WithOrigins("https://localhost:5001")
-                    .AllowAnyMethod()
-                    .AllowAnyHeader()
-                    .AllowCredentials());
+                return;
             }
+            var hostsCsvList = configuration.GetValue("Cors:Hosts", "");
+            var hosts = string.IsNullOrWhiteSpace(hostsCsvList) ? 
+                Array.Empty<string>() : 
+                hostsCsvList.Split(",");
+            app.UseCors(builder => builder
+                .WithOrigins(hosts)
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials());
         }
         public static void ConfigureCors(this IServiceCollection services, IConfiguration configuration)
         {
@@ -57,8 +62,8 @@ namespace Tasktower.OcelotGateway.Configuration.StartupExtensions
             });
 
         }
-        
-        public static void CheckSameSite(CookieOptions options)
+
+        private static void CheckSameSite(CookieOptions options)
         {
             if (options.SameSite == SameSiteMode.None && options.Secure == false)
             {
