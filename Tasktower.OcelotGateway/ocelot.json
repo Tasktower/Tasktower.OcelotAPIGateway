@@ -2,11 +2,11 @@
   "Routes": [
     {
       "DownstreamPathTemplate": "/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
           "Host": "tasktower-ui-service",
-          "Port": 80
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/{everything}",
@@ -14,11 +14,11 @@
     },
     {
       "DownstreamPathTemplate": "/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
           "Host": "tasktower-project-service",
-          "Port": 80
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/services/project/api/{everything}",
