@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Librame.Extensions;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -56,7 +60,40 @@ namespace Tasktower.OcelotGateway.Controllers
         [HttpGet("user")]
         public async Task<UserInfo> GetUser()
         {
-            return await UserInfo.FromHttpContext(HttpContext, IsWebApp);
+            var defaultUserInfo = new UserInfo
+            {
+                IsAuthenticated = false,
+                UserId = "ANONYMOUS",
+                Name = "ANONYMOUS",
+                Permissions = new List<string>()
+            };
+
+            string accessTokenString; 
+            if (IsWebApp)
+            {
+                accessTokenString = HttpContext == null || (!HttpContext.User.Identity?.IsAuthenticated ?? false)? 
+                    "" : await HttpContext.GetTokenAsync("access_token");
+            }
+            else
+            {
+                var authorizationHeader = HttpContext.Request.Headers["Authorization"].FirstOrDefault() ?? "";
+                accessTokenString = authorizationHeader.StartsWith("Bearer ")? authorizationHeader[7..]: "";
+            }
+            
+            var handler = new JwtSecurityTokenHandler();
+            if (!handler.CanReadToken(accessTokenString)) return defaultUserInfo;
+
+            var securityToken = handler.ReadJwtToken(accessTokenString);
+            IDictionary<string, IEnumerable<Claim>> claims = securityToken.Claims
+                .GroupBy(c => c.Type)
+                .ToDictionary(g => g.Key,g => g.AsEnumerable());
+            return new UserInfo
+            {
+                IsAuthenticated = securityToken.IsNotNull(),
+                UserId = securityToken.Subject,
+                Name = claims[ClaimTypes.Name].First().Value,
+                Permissions = claims["permissions"].Select(c => c.Value)
+            };
         }
 
         private bool IsWebApp => _configuration.GetValue("GatewayInfo:WebApp", true);
