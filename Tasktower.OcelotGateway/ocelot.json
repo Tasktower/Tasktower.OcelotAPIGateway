@@ -23,6 +23,18 @@
       ],
       "UpstreamPathTemplate": "/services/project/api/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "PATCH", "DELETE" ]
+    },
+    {
+      "DownstreamPathTemplate": "/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "tasktower-user-service",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/services/user/api/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "PATCH", "DELETE" ]
     }
   ],
   "GlobalConfiguration": {
