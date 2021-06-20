@@ -57,10 +57,10 @@ namespace Tasktower.OcelotGateway.Controllers
             }
         }
         
-        [HttpGet("user")]
-        public async Task<UserInfo> GetUser()
+        [HttpGet("user/access-data")]
+        public async Task<UserAccessInfo> GetUser()
         {
-            var defaultUserInfo = new UserInfo
+            var defaultUserInfo = new UserAccessInfo
             {
                 IsAuthenticated = false,
                 UserId = "ANONYMOUS",
@@ -87,12 +87,27 @@ namespace Tasktower.OcelotGateway.Controllers
             IDictionary<string, IEnumerable<Claim>> claims = securityToken.Claims
                 .GroupBy(c => c.Type)
                 .ToDictionary(g => g.Key,g => g.AsEnumerable());
-            return new UserInfo
+            return new UserAccessInfo
             {
                 IsAuthenticated = securityToken.IsNotNull(),
                 UserId = securityToken.Subject,
                 Name = claims[ClaimTypes.Name].First().Value,
                 Permissions = claims["permissions"].Select(c => c.Value)
+            };
+        }
+
+        [HttpGet("user/identity")]
+        public UserIdentityInfo UserIdentity()
+        {
+            return new()
+            {
+                IsAuthenticated = User.Identity?.IsAuthenticated ?? false,
+                UserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "ANONYMOUS",
+                Name = User.Identity?.Name ?? "ANONYMOUS",
+                Nickname = User.FindFirst("nickname")?.Value ?? "ANONYMOUS",
+                Email = User.FindFirst(ClaimTypes.Email)?.Value,
+                EmailVerified = User.FindFirst("email_verified")?.Value == "true",
+                Picture = User.FindFirst("picture")?.Value
             };
         }
 

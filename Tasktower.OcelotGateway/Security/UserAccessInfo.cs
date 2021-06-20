@@ -12,7 +12,7 @@ using Microsoft.IdentityModel.Json.Linq;
 
 namespace Tasktower.OcelotGateway.Security
 {
-    public class UserInfo
+    public class UserAccessInfo
     {
         public bool IsAuthenticated { get; init; }
 
