@@ -29,8 +29,8 @@ namespace Tasktower.OcelotGateway.Controllers
             _configuration = configuration;
         }
 
-        [HttpPost("login")]
-        public async Task Login([FromQuery]string returnUrl)
+        [HttpPost("sign-in")]
+        public async Task SignIn([FromQuery]string returnUrl)
         {
             if (IsWebApp)
             {
@@ -41,8 +41,8 @@ namespace Tasktower.OcelotGateway.Controllers
             }
         }
         
-        [HttpPost("logout")]
-        public async Task Logout([FromQuery]string returnUrl)
+        [HttpPost("sign-out")]
+        public async Task SignOut([FromQuery]string returnUrl)
         {
             if (HttpContext.User.Identity != null && IsWebApp && HttpContext.User.Identity.IsAuthenticated)
             {
@@ -50,7 +50,7 @@ namespace Tasktower.OcelotGateway.Controllers
                 {
                     // Indicate here where Auth0 should redirect the user after a logout.
                     // Note that the resulting absolute Uri must be added to the
-                    // **Allowed Logout URLs** settings for the app.
+                    // **Allowed SignOut URLs** settings for the app.
                     RedirectUri = returnUrl
                 });
                 await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
@@ -87,12 +87,15 @@ namespace Tasktower.OcelotGateway.Controllers
             IDictionary<string, IEnumerable<Claim>> claims = securityToken.Claims
                 .GroupBy(c => c.Type)
                 .ToDictionary(g => g.Key,g => g.AsEnumerable());
+            
             return new UserAccessInfo
             {
                 IsAuthenticated = securityToken.IsNotNull(),
                 UserId = securityToken.Subject,
                 Name = claims[ClaimTypes.Name].First().Value,
-                Permissions = claims["permissions"].Select(c => c.Value)
+                Permissions = claims.ContainsKey("permissions")
+                    ? claims["permissions"]?.Select(c => c.Value) 
+                    : Array.Empty<string>()
             };
         }
 
